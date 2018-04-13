@@ -33,6 +33,11 @@ repel_pisteet <- bind_rows(keskiarvo, autoja) %>%
     hour(aika) > 10 ~ 30,
          TRUE ~ 10))
 
+kausiautot <- kivi %>% 
+  filter(hour(timestamp) == 5) %>% 
+  distinct(totalspace) %>% 
+  mutate(kausi = 900 - totalspace)
+
 pv <- ggplot(kivi, aes(timestamp, osuus)) +
   geom_hline(yintercept = keskiarvo$y) +
   geom_line(size = 1, color = "red") +
@@ -49,7 +54,9 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   scale_y_continuous(labels = function(x) paste(x, "%")) +
   theme_minimal() +
   theme(text = element_text(size = 8),
-                 axis.text.x = element_text(angle = 90, vjust = 0.5))
+                 axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  annotate("text", x = ymd_hm(paste(today() - days(0), "00:00")), y = 90, 
+           label = paste("Kausipaikkoja varattu\n", kausiautot$kausi, "kappaletta."), hjust = 1, size = 3)
   # ggrepel::geom_text_repel(data = autoja, aes(label = paste("Aamuyöllä hallissa\n", autoja, "autoa.")), 
   #                          direction = "y", nudge_y = 10, size = 3) +
   # geom_point(data = autoja, size = 2, color = "blue")
