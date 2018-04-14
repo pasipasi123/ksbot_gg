@@ -55,7 +55,7 @@ reset_test <- function(df) {
 alku <- floor_date(today() - weeks(1)) %>% as_date 
 paivat <- alku + days(0:6)
 
-fi <- list.files("~/ptalot/data", full.names = TRUE)) %>% 
+fi <- list.files("~/ptalot/data", full.names = TRUE) %>% 
   enframe() %>% 
   arrange(name) %>% 
   tail(2) %>% 
