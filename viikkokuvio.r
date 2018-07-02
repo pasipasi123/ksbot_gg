@@ -14,7 +14,7 @@ datelab <- function(x) {
   y <- year(x)
   
   paste0(
-    wday(x, label = TRUE, locale = "Finnish_Finland.1252") %>% str_to_title(), "\n", 
+    wday(x, label = TRUE) %>% str_to_title(), "\n", 
     d, ".", m, ".", y)
 }
 
