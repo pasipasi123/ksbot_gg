@@ -8,8 +8,6 @@ library(ggplot2)
 library(jsonlite)
 library(stringr)
 
-#haha
-
 datelab <- function(x) {
   d <- day(x)
   m <- month(x)
