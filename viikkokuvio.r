@@ -8,6 +8,8 @@ library(ggplot2)
 library(jsonlite)
 library(stringr)
 
+Sys.setlocale("LC_TIME", "fi_FI.utf8")
+
 datelab <- function(x) {
   d <- day(x)
   m <- month(x)
