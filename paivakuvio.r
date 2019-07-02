@@ -1,16 +1,14 @@
-library(dplyr)
-library(magrittr)
+library(tidyverse)
 library(lubridate)
-library(jsonlite)
-library(ggplot2)
 
-wdata <- as_tibble(jsonlite::fromJSON("dataa.txt"))
+# wdata <- as_tibble(jsonlite::fromJSON("dataa.txt"))
+wdata <- readRDS("dataa.rds")
 
 kivi <- wdata %>%
   filter(name == "Kivisydän") %>%
-  mutate(timestamp = dmy_hms(timestamp),
+  mutate(#timestamp = dmy_hms(timestamp),
          date = as_date(timestamp)) %>%
-  mutate_at(vars(ends_with("space")), as.integer) %>%
+  # mutate_at(vars(ends_with("space")), as.integer) %>%
   filter(date == today() - days(1)) %>%
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
@@ -50,7 +48,7 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   ggrepel::geom_text_repel(data = repel_pisteet, aes(x = aika, y = y, label = label),
                            direction = "y", nudge_y = repel_pisteet$nudge_y, size = 3) +
   geom_point(data = autoja, aes(aika, y), size = 2, color = "blue") +
-  scale_x_datetime(date_breaks = "1 hour", date_labels= "%H:%M") +
+  scale_x_datetime(date_breaks = "1 hour", date_labels= "%H:%M", expand = c(0, 0)) +
   scale_y_continuous(labels = function(x) paste(x, "%")) +
   theme_minimal() +
   theme(text = element_text(size = 8),
