@@ -47,7 +47,7 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   coord_cartesian(ylim = c(0, 100)) +
   # geom_text(aes(x = keskipv, y = keski + 5, label = paste0("Keskiarvo klo 8–20 ", keski, " %")), size = 3) +
   ggrepel::geom_text_repel(data = repel_pisteet, aes(x = aika, y = y, label = label),
-                           direction = "y", nudge_y = repel_pisteet$nudge_y, size = 3) +
+                           direction = "y", nudge_y = repel_pisteet$nudge_y, size = 2.5) +
   geom_point(data = autoja, aes(aika, y), size = 2, color = "blue") +
   scale_x_datetime(date_breaks = "1 hour", date_labels= "%H:%M") +
   scale_y_continuous(labels = function(x) paste(x, "%")) +
@@ -55,7 +55,7 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   theme(text = element_text(size = 8),
                  axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   annotate("text", x = ymd_hm(paste(today() - days(1), "20:00")), y = 90, 
-           label = paste("Kausipaikkoja varattu\n", kausiautot$kausi, "kappaletta."), hjust = 1, size = 3)
+           label = paste("Kausipaikkoja varattu\n", kausiautot$kausi, "kappaletta."), hjust = 1, size = 2.5)
   # ggrepel::geom_text_repel(data = autoja, aes(label = paste("Aamuyöllä hallissa\n", autoja, "autoa.")), 
   #                          direction = "y", nudge_y = 10, size = 3) +
   # geom_point(data = autoja, size = 2, color = "blue")
