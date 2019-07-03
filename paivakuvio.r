@@ -25,11 +25,12 @@ autoja <- kivi %>% filter(hour(timestamp) == 2) %>%
   transmute(aika = timestamp, y = osuus, autoja = totalspace - freespace) 
 
 repel_pisteet <- bind_rows(keskiarvo, autoja) %>% 
-  mutate(label = c(paste0("Keskiarvo klo 8–20 ", y[1], " %"), 
+  mutate(label = c(paste0("Keskiarvo klo 8–20\n", format(y[1], decimal.mark = ",", digits = 3), " %"), 
                    paste("Aamuyöllä hallissa\n", autoja[2], "autoa."))) %>% 
   mutate(nudge_y = case_when(
-    hour(aika) > 10 ~ 30,
-         TRUE ~ 10))
+    str_detect(label, "Keski") ~ 10,
+    abs(y + 30 - lag(y)) < 10 ~ 10,
+    TRUE ~ 30))
 
 kausiautot <- kivi %>% 
   filter(hour(timestamp) == 5) %>% 
@@ -53,7 +54,7 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   theme_minimal() +
   theme(text = element_text(size = 8),
                  axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-  annotate("text", x = ymd_hm(paste(today() - days(0), "00:00")), y = 90, 
+  annotate("text", x = ymd_hm(paste(today() - days(1), "20:00")), y = 90, 
            label = paste("Kausipaikkoja varattu\n", kausiautot$kausi, "kappaletta."), hjust = 1, size = 3)
   # ggrepel::geom_text_repel(data = autoja, aes(label = paste("Aamuyöllä hallissa\n", autoja, "autoa.")), 
   #                          direction = "y", nudge_y = 10, size = 3) +
