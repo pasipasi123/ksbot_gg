@@ -48,7 +48,7 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
   ggrepel::geom_text_repel(data = repel_pisteet, aes(x = aika, y = y, label = label),
                            direction = "y", nudge_y = repel_pisteet$nudge_y, size = 3) +
   geom_point(data = autoja, aes(aika, y), size = 2, color = "blue") +
-  scale_x_datetime(date_breaks = "1 hour", date_labels= "%H:%M", expand = c(0, 0)) +
+  scale_x_datetime(date_breaks = "1 hour", date_labels= "%H:%M") +
   scale_y_continuous(labels = function(x) paste(x, "%")) +
   theme_minimal() +
   theme(text = element_text(size = 8),
