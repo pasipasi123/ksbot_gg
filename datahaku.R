@@ -38,3 +38,5 @@ if (file.exists("dataa.rds")) {
 }
 
 saveRDS(kivis, file = "kivis.rds")
+
+quit(save = "no")

@@ -4,11 +4,20 @@ library(lubridate)
 # wdata <- as_tibble(jsonlite::fromJSON("dataa.txt"))
 wdata <- readRDS("dataa.rds")
 
+# lisätään totalspacea, koska viikonloppuna kausipaikkoja on vähemmän
+vkl_alku <- paste(floor_date(today(), "week", week_start = 1) + days(4), "16:01:00") %>% ymd_hms(tz = "Europe/Helsinki")
+vkl_loppu <- paste(floor_date(today(), "week", week_start = 1) + days(7), "06:01:00") %>% ymd_hms(tz = "Europe/Helsinki")
+
+# viikonloppuobjekti
+vkl_int <- interval(vkl_alku, vkl_loppu)
+
 kivi <- wdata %>%
   filter(name == "Kivisydän") %>%
+  filter(carParkId == 6) %>% 
   mutate(#timestamp = dmy_hms(timestamp),
          date = as_date(timestamp)) %>%
   # mutate_at(vars(ends_with("space")), as.integer) %>%
+  mutate(totalspace = if_else(timestamp %within% vkl_int, totalspace + 100L, totalspace)) %>% 
   filter(date == today() - days(1)) %>%
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
@@ -62,4 +71,4 @@ pv <- ggplot(kivi, aes(timestamp, osuus)) +
 
 ggsave("kuvio.png", h = 4, w = 5)
 
-
+quit(save = "no")
