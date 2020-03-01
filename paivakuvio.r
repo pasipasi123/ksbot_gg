@@ -14,6 +14,7 @@ wdata <- readRDS("dataa.rds")
 onko_vkl <- function(dttm) {
   v_paiva <- wday(dttm, week_start = 1)
   
+  if (v_paiva %in% 2:4) return(FALSE)
   if (v_paiva %in% 6:7) return(TRUE)
   if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
   if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
