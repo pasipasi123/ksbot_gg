@@ -10,6 +10,17 @@ library(stringr)
 
 Sys.setlocale("LC_TIME", "fi_FI.utf8")
 
+onko_vkl <- function(dttm) {
+  v_paiva <- wday(dttm, week_start = 1)
+  
+  if (v_paiva %in% 2:4) return(FALSE)
+  if (v_paiva %in% 6:7) return(TRUE)
+  if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
+  if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
+  
+  return(FALSE)
+}
+
 datelab <- function(x) {
   d <- day(x)
   m <- month(x)
@@ -69,10 +80,11 @@ da <- map(fi, fromJSON) %>%
 
 da <- da %>% 
   filter(name == "Kivisydän") %>% 
-  mutate(timestamp = dmy_hms(timestamp),
+  mutate(timestamp = dmy_hms(timestamp, tz = "Europe/Helsinki"),
          date = as_date(timestamp)) %>% 
   filter(date %in% paivat) %>%
   mutate_at(vars(totalspace, freespace), as.integer) %>% 
+  mutate(totalspace = if_else(onko_vkl(timestamp), totalspace + 100L, totalspace)) %>% 
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
 reset_list <- reset_test(da)
