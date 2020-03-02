@@ -11,14 +11,16 @@ library(stringr)
 Sys.setlocale("LC_TIME", "fi_FI.utf8")
 
 onko_vkl <- function(dttm) {
-  v_paiva <- wday(dttm, week_start = 1)
-  
-  if (v_paiva %in% 2:4) return(FALSE)
-  if (v_paiva %in% 6:7) return(TRUE)
-  if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
-  if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
-  
-  return(FALSE)
+  sapply(dttm, function(dttm) {
+    v_paiva <- wday(dttm, week_start = 1)
+    
+    if (v_paiva %in% 2:4) return(FALSE)
+    if (v_paiva %in% 6:7) return(TRUE)
+    if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
+    if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
+    
+    return(FALSE)
+  })
 }
 
 datelab <- function(x) {
@@ -69,22 +71,24 @@ alku <- floor_date(today() - weeks(1)) %>% as_date
 paivat <- alku + days(0:6)
 
 fi <- list.files("~/ptalot/data", full.names = TRUE) %>% 
+# fi <- list.files("data/", full.names = TRUE) %>% 
   enframe() %>% 
   arrange(name) %>% 
   tail(2) %>% 
   pull(value)
 
-da <- map(fi, fromJSON) %>% 
-  bind_rows %>% 
-  as_tibble
+da <- map_df(fi, readRDS)
 
 da <- da %>% 
-  filter(name == "Kivisydän") %>% 
-  mutate(timestamp = dmy_hms(timestamp, tz = "Europe/Helsinki"),
-         date = as_date(timestamp)) %>% 
+  # filter(name == "Kivisydän") %>% 
+  filter(carParkId == 6) %>%
+  mutate(date = as_date(timestamp)) %>% 
   filter(date %in% paivat) %>%
   mutate_at(vars(totalspace, freespace), as.integer) %>% 
-  mutate(totalspace = if_else(onko_vkl(timestamp), totalspace + 100L, totalspace)) %>% 
+  rowwise() %>% 
+  mutate(totalspace = if_else(onko_vkl(timestamp) | freespace > totalspace, totalspace + 100L, totalspace)) %>%
+  # mutate(totalspace = if_else(onko_vkl(timestamp), totalspace + 100L, totalspace)) %>%
+  ungroup() %>% 
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
 reset_list <- reset_test(da)

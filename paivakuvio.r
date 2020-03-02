@@ -12,23 +12,25 @@ wdata <- readRDS("dataa.rds")
 # vkl_int <- interval(vkl_alku, vkl_loppu)
 
 onko_vkl <- function(dttm) {
-  v_paiva <- wday(dttm, week_start = 1)
-  
-  if (v_paiva %in% 2:4) return(FALSE)
-  if (v_paiva %in% 6:7) return(TRUE)
-  if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
-  if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
-  
-  return(FALSE)
+  sapply(dttm, function(dttm) {
+    v_paiva <- wday(dttm, week_start = 1)
+    
+    if (v_paiva %in% 2:4) return(FALSE)
+    if (v_paiva %in% 6:7) return(TRUE)
+    if (v_paiva == 5 && hms::as_hms(dttm) > hms::hms(0, 1, 16)) return(TRUE)
+    if (v_paiva == 1 && hms::as_hms(dttm) < hms::hms(0, 1, 6)) return(TRUE)
+    
+    return(FALSE)
+  })
 }
 
 kivi <- wdata %>%
   filter(name == "Kivisydän") %>%
   filter(carParkId == 6) %>% 
-  mutate(#timestamp = dmy_hms(timestamp),
-         date = as_date(timestamp)) %>%
+  mutate(date = as_date(timestamp)) %>%
   # mutate_at(vars(ends_with("space")), as.integer) %>%
-  mutate(totalspace = if_else(onko_vkl(timestamp), totalspace + 100L, totalspace)) %>% 
+  mutate(totalspace = if_else(onko_vkl(timestamp) | freespace > totalspace, 
+                              totalspace + 100L, totalspace)) %>% 
   filter(date == today() - days(1)) %>%
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
