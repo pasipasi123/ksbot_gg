@@ -28,10 +28,14 @@ kivi <- wdata %>%
   filter(name == "Kivisydän") %>%
   filter(carParkId == 6) %>% 
   mutate(date = as_date(timestamp)) %>%
+  filter(date == today() - days(1)) #%>%
   # mutate_at(vars(ends_with("space")), as.integer) %>%
-  mutate(totalspace = if_else(onko_vkl(timestamp) | freespace > totalspace, 
+
+parillinen_vko <- kivi %>% sample_n(1) %>% pull(timestamp) %>% isoweek() %% 2 == 0
+
+kivi <- kivi %>% 
+  mutate(totalspace = if_else((onko_vkl(timestamp) & isTRUE(parillinen_vko)) | freespace > totalspace, 
                               totalspace + 100L, totalspace)) %>% 
-  filter(date == today() - days(1)) %>%
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
 
 keskiarvo <- kivi %>% 

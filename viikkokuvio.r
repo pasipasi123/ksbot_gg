@@ -84,9 +84,13 @@ da <- da %>%
   filter(carParkId == 6) %>%
   mutate(date = as_date(timestamp)) %>% 
   filter(date %in% paivat) %>%
-  mutate_at(vars(totalspace, freespace), as.integer) %>% 
+  mutate_at(vars(totalspace, freespace), as.integer)
+
+parillinen_vko <- da %>% sample_n(1) %>% pull(timestamp) %>% isoweek() %% 2 == 0
+
+da <- da %>% 
   rowwise() %>% 
-  mutate(totalspace = if_else(onko_vkl(timestamp) | freespace > totalspace, totalspace + 100L, totalspace)) %>%
+  mutate(totalspace = if_else((onko_vkl(timestamp) & isTRUE(parillinen_vko)) | freespace > totalspace, totalspace + 100L, totalspace)) %>%
   # mutate(totalspace = if_else(onko_vkl(timestamp), totalspace + 100L, totalspace)) %>%
   ungroup() %>% 
   mutate(osuus = round(100 - (100 * freespace / totalspace), 1))
