@@ -52,12 +52,14 @@ post <- ptalo_data %>%
   with(paste0(name, ": ", spacesAvailable, "\n")) %>%
   str_c(collapse = "")
 
-post <- str_c("Vapaita parkkipaikkoja Oulun keskustassa:\n\n", post)
+kello <- hour(now(tzone = "Europe/Helsinki"))
+
+post <- str_c("Vapaita parkkipaikkoja Oulun keskustassa kello ", kello, ":\n\n", post)
 
 set_bluesky_user('oulun-parkkitalot.bsky.social')
 set_bluesky_pass(readr::read_rds("bsky_token.rds"))
 
-# bs_post(text = post)
+bs_post(text = post)
 
 ptalo_data %>%
   st_set_geometry(NULL) %>%
