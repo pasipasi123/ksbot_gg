@@ -54,7 +54,7 @@ post <- ptalo_data %>%
 
 kello <- hour(now(tzone = "Europe/Helsinki"))
 
-post <- str_c("Vapaita parkkipaikkoja Oulun keskustassa kello ", kello, ":\n\n", post)
+post <- str_c("Vapaita parkkipaikkoja keskustassa kello ", kello, ":\n\n", post)
 
 set_bluesky_user('oulun-parkkitalot.bsky.social')
 set_bluesky_pass(readr::read_rds("bsky_token.rds"))
